@@ -59,7 +59,7 @@ pipeline {
                  body: "Build ${env.BUILD_ID} failed. Check Jenkins for details."
         }
         success {
-            mail to: 'ar67445@gmail.com',
+            mail to: 'omerseyam1729@gmail.com',
                  subject: "Jenkins Build Success: ${env.BUILD_ID}",
                  body: "Build ${env.BUILD_ID} completed successfully."
         }
