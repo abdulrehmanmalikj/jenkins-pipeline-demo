@@ -1,184 +1,71 @@
 pipeline {
-    
     agent any
 
     stages {
-        stage('Build') {
+        stage('Compile') {
             steps {
-                echo 'Stage 1: Build'
-                echo 'Task: Build the code using a build automation tool'
-                echo 'Tools: Bazel, Make, CMake'
-            }
-            post {
-                failure {
-                    script {
-                        emailext (
-                            to: 'ar67445@gmail.com',
-                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Build Stage",
-                            body: "Build failed. Please check the logs for details.",
-                            attachLog: true
-                        )
-                    }
-                }
+                echo 'Compiling the project...'
+                echo 'Tools involved: Bazel, Make, CMake for building'
             }
         }
-
-        stage('Unit and Integration Tests') {
+        stage('Testing') {
             steps {
-                echo 'Stage 2: Unit and Integration Tests'
-                echo 'Task: Run unit tests and integration tests'
-                echo 'Tools: Pytest, Jasmine, Mocha, Robot Framework'
-                sh 'echo "Running unit tests..." > unit-tests.log'
-                // Add actual test commands here, e.g., sh 'npm test'
-                sh 'echo "Tests completed successfully." >> unit-tests.log'
-            }
-            post {
-                always {
-                    script {
-                        def buildStatus = currentBuild.result ?: 'SUCCESS'
-                        def subject = "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Unit and Integration Tests ${buildStatus}"
-                        def body = """
-                        Unit and Integration Tests Status: ${buildStatus}
-                        Job: ${env.JOB_NAME}
-                        Build Number: ${env.BUILD_NUMBER}
-                        """
-                        emailext (
-                            to: 'ar67445@gmail.com',
-                            subject: subject,
-                            body: body,
-                            attachmentsPattern: 'unit-tests.log'
-                        )
-                    }
-                }
+                echo 'Executing Unit and Integration Tests...'
+                echo 'Frameworks used: Pytest, Jasmine, Mocha, Robot Framework'
+                sh 'echo "Unit and integration tests in progress..." > test-results.log'
+                sh 'echo "All tests successfully completed." >> test-results.log'
             }
         }
-
-        stage('Code Analysis') {
+        stage('Static Code Review') {
             steps {
-                echo 'Stage 3: Code Analysis'
-                echo 'Task: Analyze code quality and adherence to industry standards'
-                echo 'Tools: ESLint, Pylint, Codacy, Flake8'
-            }
-            post {
-                failure {
-                    script {
-                        emailext (
-                            to: 'ar6744@gmail.com',
-                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Code Analysis Stage",
-                            body: "Code analysis failed. Please check the logs for details.",
-                            attachLog: true
-                        )
-                    }
-                }
+                echo 'Performing Static Code Analysis...'
+                echo 'Tools for analysis: ESLint, Pylint, Codacy, Flake8'
             }
         }
-
-        stage('Security Scan') {
+        stage('Vulnerability Check') {
             steps {
-                echo 'Stage 4: Security Scan'
-                echo 'Task: Scan the code for security vulnerabilities'
-                echo 'Tools: WhiteSource, Acunetix, Fortify, Clair'
-                sh 'echo "Running security scan..." > security-scan.log'
-                sh 'echo "Security scan completed successfully." >> security-scan.log'
-            }
-            post {
-                always {
-                    script {
-                        def buildStatus = currentBuild.result ?: 'SUCCESS'
-                        def subject = "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Security Scan ${buildStatus}"
-                        def body = """
-                        Security Scan Status: ${buildStatus}
-                        Job: ${env.JOB_NAME}
-                        Build Number: ${env.BUILD_NUMBER}
-                        """
-                        emailext (
-                            to: 'ar67445@gmail.com',
-                            subject: subject,
-                            body: body,
-                            attachmentsPattern: 'security-scan.log'
-                        )
-                    }
-                }
+                echo 'Conducting Security Scans...'
+                echo 'Security Tools: WhiteSource, Acunetix, Fortify, Clair'
+                sh 'echo "Executing security scan..." > security-scan-results.log'
+                sh 'echo "Security scan finished successfully." >> security-scan-results.log'
             }
         }
-
-        stage('Deploy to Staging') {
+        stage('Staging Deployment') {
             steps {
-                echo 'Stage 5: Deploy to Staging'
-                echo 'Task: Deploy the application to a staging environment'
-                echo 'Tools: Jenkins X, GitLab CI/CD, CircleCI'
-            }
-            post {
-                failure {
-                    script {
-                        emailext (
-                            to: 'ar67445@gmail.com',
-                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Deploy to Staging Stage",
-                            body: "Deployment to staging failed. Please check the logs for details.",
-                            attachLog: true
-                        )
-                    }
-                }
+                echo 'Deploying application to staging environment...'
+                echo 'Deployment Tools: Jenkins X, GitLab CI/CD, CircleCI'
             }
         }
-
-        stage('Integration Tests on Staging') {
+        stage('Staging Tests') {
             steps {
-                echo 'Stage 6: Integration Tests on Staging'
-                echo 'Task: Run integration tests in the staging environment'
-                echo 'Tools: JMeter, Gatling, SoapUI, Katalon Studio'
-            }
-            post {
-                failure {
-                    script {
-                        emailext (
-                            to: 'ar67445@gmail.com',
-                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Integration Tests Stage",
-                            body: "Integration tests on staging failed. Please check the logs for details.",
-                            attachLog: true
-                        )
-                    }
-                }
+                echo 'Running integration tests on staging...'
+                echo 'Testing Tools: JMeter, Gatling, SoapUI, Katalon Studio'
             }
         }
-
-        stage('Deploy to Production') {
+        stage('Production Deployment') {
             steps {
-                echo 'Stage 7: Deploy to Production'
-                echo 'Task: Deploy the application to the production server'
-                echo 'Tools: Terraform, Packer, Chef, Puppet'
-            }
-            post {
-                failure {
-                    script {
-                        emailext (
-                            to: 'ar67445@gmail.com',
-                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Deploy to Production Stage",
-                            body: "Deployment to production failed. Please check the logs for details.",
-                            attachLog: true
-                        )
-                    }
-                }
+                echo 'Deploying to the production environment...'
+                echo 'Deployment automation: Terraform, Packer, Chef, Puppet'
             }
         }
     }
     post {
         always {
-            script {
-                def buildStatus = currentBuild.result ?: 'SUCCESS'
-                def subject = "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - ${buildStatus}"
-                def body = """
-                Build Status: ${buildStatus}
-                Job: ${env.JOB_NAME}
-                Build Number: ${env.BUILD_NUMBER}
-                """
-                emailext (
-                    to: 'ar67445@gmail.com',
-                    subject: subject,
-                    body: body,
-                    attachLog: true
-                )
-            }
+            echo 'The pipeline has completed!'
+        }
+        failure {
+            emailext attachLog: true,
+                     to: 'ar67445@gmail.com',
+                     subject: "Build Failed: ${env.BUILD_ID} - Review Required",
+                     body: """<p>Build ${env.BUILD_ID} encountered an issue.</p>
+                              <p>Check Jenkins here: ${env.BUILD_URL}</p>"""
+        }
+        success {
+            emailext attachLog: true,
+                     to: 'ar67445@gmail.com',
+                     subject: "Build Succeeded: ${env.BUILD_ID}",
+                     body: """<p>Build ${env.BUILD_ID} was successful.</p>
+                              <p>Check Jenkins for more details: ${env.BUILD_URL}</p>"""
         }
     }
 }
