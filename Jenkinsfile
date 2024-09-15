@@ -11,13 +11,20 @@ pipeline {
                 echo 'Stage 1: Compile'
                 echo 'Task: Compile the source code'
                 echo 'Tools: GCC, Make, CMake'
-                sh 'make compile > compile.log'
+                script {
+                    try {
+                        sh 'make compile > compile.log'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Compilation failed")
+                    }
+                }
             }
             post {
                 failure {
                     emailext (
-                        to: "${env.RECIPIENT}",
-                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Compile Stage",
+                        to: "${RECIPIENT}",
+                        subject: "${JOB_NAME} - Build ${BUILD_NUMBER} Failed at Compile Stage",
                         body: "Compilation failed. Please check the compile.log for details.",
                         attachmentsPattern: 'compile.log'
                     )
@@ -30,23 +37,27 @@ pipeline {
                 echo 'Stage 2: Static Code Analysis'
                 echo 'Task: Perform static analysis on the codebase'
                 echo 'Tools: ESLint, PMD, FindBugs'
-                sh 'eslint . --output-file eslint-report.json'
+                script {
+                    try {
+                        sh 'eslint . --output-file eslint-report.json'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Static Code Analysis failed")
+                    }
+                }
             }
             post {
                 always {
-                    script {
-                        def buildStatus = currentBuild.result ?: 'SUCCESS'
-                        emailext (
-                            to: "${env.RECIPIENT}",
-                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Static Code Analysis ${buildStatus}",
-                            body: """
-                                Static Code Analysis Status: ${buildStatus}
-                                Job: ${env.JOB_NAME}
-                                Build Number: ${env.BUILD_NUMBER}
-                            """,
-                            attachmentsPattern: 'eslint-report.json'
-                        )
-                    }
+                    emailext (
+                        to: "${RECIPIENT}",
+                        subject: "${JOB_NAME} - Build ${BUILD_NUMBER} - Static Code Analysis ${currentBuild.result}",
+                        body: """
+                            Static Code Analysis Status: ${currentBuild.result}
+                            Job: ${JOB_NAME}
+                            Build Number: ${BUILD_NUMBER}
+                        """,
+                        attachmentsPattern: 'eslint-report.json'
+                    )
                 }
             }
         }
@@ -56,13 +67,20 @@ pipeline {
                 echo 'Stage 3: Dependency Management'
                 echo 'Task: Manage and update project dependencies'
                 echo 'Tools: npm, Yarn, Bundler'
-                sh 'yarn install --frozen-lockfile > dependency.log'
+                script {
+                    try {
+                        sh 'yarn install --frozen-lockfile > dependency.log'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Dependency management failed")
+                    }
+                }
             }
             post {
                 failure {
                     emailext (
-                        to: "${env.RECIPIENT}",
-                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Dependency Management Stage",
+                        to: "${RECIPIENT}",
+                        subject: "${JOB_NAME} - Build ${BUILD_NUMBER} Failed at Dependency Management Stage",
                         body: "Dependency management failed. Please check the dependency.log for details.",
                         attachmentsPattern: 'dependency.log'
                     )
@@ -75,24 +93,28 @@ pipeline {
                 echo 'Stage 4: Dynamic Security Testing'
                 echo 'Task: Perform dynamic security assessments'
                 echo 'Tools: Burp Suite, ZAP, AppScan'
-                sh 'zap.sh -daemon -config api.disablekey=true -port 8080'
-                sh 'echo "Dynamic security testing completed." > dynamic-security.log'
+                script {
+                    try {
+                        sh 'zap.sh -daemon -config api.disablekey=true -port 8080'
+                        sh 'echo "Dynamic security testing completed." > dynamic-security.log'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Dynamic security testing failed")
+                    }
+                }
             }
             post {
                 always {
-                    script {
-                        def buildStatus = currentBuild.result ?: 'SUCCESS'
-                        emailext (
-                            to: "${env.RECIPIENT}",
-                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Dynamic Security Testing ${buildStatus}",
-                            body: """
-                                Dynamic Security Testing Status: ${buildStatus}
-                                Job: ${env.JOB_NAME}
-                                Build Number: ${env.BUILD_NUMBER}
-                            """,
-                            attachmentsPattern: 'dynamic-security.log'
-                        )
-                    }
+                    emailext (
+                        to: "${RECIPIENT}",
+                        subject: "${JOB_NAME} - Build ${BUILD_NUMBER} - Dynamic Security Testing ${currentBuild.result}",
+                        body: """
+                            Dynamic Security Testing Status: ${currentBuild.result}
+                            Job: ${JOB_NAME}
+                            Build Number: ${BUILD_NUMBER}
+                        """,
+                        attachmentsPattern: 'dynamic-security.log'
+                    )
                 }
             }
         }
@@ -102,13 +124,20 @@ pipeline {
                 echo 'Stage 5: Staging Deployment'
                 echo 'Task: Deploy the application to the staging environment'
                 echo 'Tools: Terraform, Helm, OpenShift'
-                sh 'terraform apply -auto-approve > staging-deploy.log'
+                script {
+                    try {
+                        sh 'terraform apply -auto-approve > staging-deploy.log'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Staging deployment failed")
+                    }
+                }
             }
             post {
                 failure {
                     emailext (
-                        to: "${env.RECIPIENT}",
-                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Staging Deployment Stage",
+                        to: "${RECIPIENT}",
+                        subject: "${JOB_NAME} - Build ${BUILD_NUMBER} Failed at Staging Deployment Stage",
                         body: "Deployment to staging failed. Please check the staging-deploy.log for details.",
                         attachmentsPattern: 'staging-deploy.log'
                     )
@@ -121,13 +150,20 @@ pipeline {
                 echo 'Stage 6: Staging Validation'
                 echo 'Task: Validate the deployment in the staging environment'
                 echo 'Tools: Postman, Newman, Gatling'
-                sh 'newman run staging-collection.json > staging-validation.log'
+                script {
+                    try {
+                        sh 'newman run staging-collection.json > staging-validation.log'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Staging validation failed")
+                    }
+                }
             }
             post {
                 failure {
                     emailext (
-                        to: "${env.RECIPIENT}",
-                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Staging Validation Stage",
+                        to: "${RECIPIENT}",
+                        subject: "${JOB_NAME} - Build ${BUILD_NUMBER} Failed at Staging Validation Stage",
                         body: "Staging validation failed. Please check the staging-validation.log for details.",
                         attachmentsPattern: 'staging-validation.log'
                     )
@@ -140,13 +176,20 @@ pipeline {
                 echo 'Stage 7: Production Deployment'
                 echo 'Task: Deploy the application to the production environment'
                 echo 'Tools: Jenkins X, Spinnaker, Flux'
-                sh 'spinnaker deploy production > production-deploy.log'
+                script {
+                    try {
+                        sh 'spinnaker deploy production > production-deploy.log'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Production deployment failed")
+                    }
+                }
             }
             post {
                 failure {
                     emailext (
-                        to: "${env.RECIPIENT}",
-                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Production Deployment Stage",
+                        to: "${RECIPIENT}",
+                        subject: "${JOB_NAME} - Build ${BUILD_NUMBER} Failed at Production Deployment Stage",
                         body: "Deployment to production failed. Please check the production-deploy.log for details.",
                         attachmentsPattern: 'production-deploy.log'
                     )
@@ -157,19 +200,16 @@ pipeline {
 
     post {
         always {
-            script {
-                def buildStatus = currentBuild.result ?: 'SUCCESS'
-                emailext (
-                    to: "${env.RECIPIENT}",
-                    subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - ${buildStatus}",
-                    body: """
-                        Build Status: ${buildStatus}
-                        Job: ${env.JOB_NAME}
-                        Build Number: ${env.BUILD_NUMBER}
-                    """,
-                    attachLog: true
-                )
-            }
+            emailext (
+                to: "${RECIPIENT}",
+                subject: "${JOB_NAME} - Build ${BUILD_NUMBER} - ${currentBuild.result ?: 'SUCCESS'}",
+                body: """
+                    Build Status: ${currentBuild.result ?: 'SUCCESS'}
+                    Job: ${JOB_NAME}
+                    Build Number: ${BUILD_NUMBER}
+                """,
+                attachLog: true
+            )
         }
     }
 }
