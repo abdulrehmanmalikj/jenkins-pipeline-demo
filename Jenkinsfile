@@ -40,6 +40,8 @@ pipeline {
             steps {
                 echo 'Running integration tests on staging...'
                 echo 'Testing Tools: JMeter, Gatling, SoapUI, Katalon Studio'
+                // Comment to indicate where build failed
+                echo 'Build failed at running integration test'
             }
         }
         stage('Production Deployment') {
