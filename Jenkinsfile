@@ -1,20 +1,8 @@
 pipeline {
     agent any
 
-    // Define common variables and functions
     environment {
         RECIPIENT = 'ar67445@gmail.com'
-    }
-
-    // Function to send email notifications
-    def sendEmail(String to, String subject, String body, String attachments = null) {
-        emailext (
-            to: to,
-            subject: subject,
-            body: body,
-            attachmentsPattern: attachments ?: '',
-            attachLog: attachments == null ? true : false
-        )
     }
 
     stages {
@@ -27,14 +15,12 @@ pipeline {
             }
             post {
                 failure {
-                    script {
-                        sendEmail(
-                            env.RECIPIENT,
-                            "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Compile Stage",
-                            "Compilation failed. Please check the compile.log for details.",
-                            'compile.log'
-                        )
-                    }
+                    emailext (
+                        to: "${env.RECIPIENT}",
+                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Compile Stage",
+                        body: "Compilation failed. Please check the compile.log for details.",
+                        attachmentsPattern: 'compile.log'
+                    )
                 }
             }
         }
@@ -48,19 +34,17 @@ pipeline {
             }
             post {
                 always {
-                    script {
-                        def buildStatus = currentBuild.result ?: 'SUCCESS'
-                        sendEmail(
-                            env.RECIPIENT,
-                            "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Static Code Analysis ${buildStatus}",
-                            """
+                    def buildStatus = currentBuild.result ?: 'SUCCESS'
+                    emailext (
+                        to: "${env.RECIPIENT}",
+                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Static Code Analysis ${buildStatus}",
+                        body: """
                             Static Code Analysis Status: ${buildStatus}
                             Job: ${env.JOB_NAME}
                             Build Number: ${env.BUILD_NUMBER}
-                            """,
-                            'eslint-report.json'
-                        )
-                    }
+                        """,
+                        attachmentsPattern: 'eslint-report.json'
+                    )
                 }
             }
         }
@@ -74,14 +58,12 @@ pipeline {
             }
             post {
                 failure {
-                    script {
-                        sendEmail(
-                            env.RECIPIENT,
-                            "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Dependency Management Stage",
-                            "Dependency management failed. Please check the dependency.log for details.",
-                            'dependency.log'
-                        )
-                    }
+                    emailext (
+                        to: "${env.RECIPIENT}",
+                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Dependency Management Stage",
+                        body: "Dependency management failed. Please check the dependency.log for details.",
+                        attachmentsPattern: 'dependency.log'
+                    )
                 }
             }
         }
@@ -96,19 +78,17 @@ pipeline {
             }
             post {
                 always {
-                    script {
-                        def buildStatus = currentBuild.result ?: 'SUCCESS'
-                        sendEmail(
-                            env.RECIPIENT,
-                            "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Dynamic Security Testing ${buildStatus}",
-                            """
+                    def buildStatus = currentBuild.result ?: 'SUCCESS'
+                    emailext (
+                        to: "${env.RECIPIENT}",
+                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Dynamic Security Testing ${buildStatus}",
+                        body: """
                             Dynamic Security Testing Status: ${buildStatus}
                             Job: ${env.JOB_NAME}
                             Build Number: ${env.BUILD_NUMBER}
-                            """,
-                            'dynamic-security.log'
-                        )
-                    }
+                        """,
+                        attachmentsPattern: 'dynamic-security.log'
+                    )
                 }
             }
         }
@@ -122,14 +102,12 @@ pipeline {
             }
             post {
                 failure {
-                    script {
-                        sendEmail(
-                            env.RECIPIENT,
-                            "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Staging Deployment Stage",
-                            "Deployment to staging failed. Please check the staging-deploy.log for details.",
-                            'staging-deploy.log'
-                        )
-                    }
+                    emailext (
+                        to: "${env.RECIPIENT}",
+                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Staging Deployment Stage",
+                        body: "Deployment to staging failed. Please check the staging-deploy.log for details.",
+                        attachmentsPattern: 'staging-deploy.log'
+                    )
                 }
             }
         }
@@ -143,14 +121,12 @@ pipeline {
             }
             post {
                 failure {
-                    script {
-                        sendEmail(
-                            env.RECIPIENT,
-                            "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Staging Validation Stage",
-                            "Staging validation failed. Please check the staging-validation.log for details.",
-                            'staging-validation.log'
-                        )
-                    }
+                    emailext (
+                        to: "${env.RECIPIENT}",
+                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Staging Validation Stage",
+                        body: "Staging validation failed. Please check the staging-validation.log for details.",
+                        attachmentsPattern: 'staging-validation.log'
+                    )
                 }
             }
         }
@@ -164,14 +140,12 @@ pipeline {
             }
             post {
                 failure {
-                    script {
-                        sendEmail(
-                            env.RECIPIENT,
-                            "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Production Deployment Stage",
-                            "Deployment to production failed. Please check the production-deploy.log for details.",
-                            'production-deploy.log'
-                        )
-                    }
+                    emailext (
+                        to: "${env.RECIPIENT}",
+                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} Failed at Production Deployment Stage",
+                        body: "Deployment to production failed. Please check the production-deploy.log for details.",
+                        attachmentsPattern: 'production-deploy.log'
+                    )
                 }
             }
         }
@@ -179,18 +153,17 @@ pipeline {
 
     post {
         always {
-            script {
-                def buildStatus = currentBuild.result ?: 'SUCCESS'
-                sendEmail(
-                    env.RECIPIENT,
-                    "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - ${buildStatus}",
-                    """
+            def buildStatus = currentBuild.result ?: 'SUCCESS'
+            emailext (
+                to: "${env.RECIPIENT}",
+                subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - ${buildStatus}",
+                body: """
                     Build Status: ${buildStatus}
                     Job: ${env.JOB_NAME}
                     Build Number: ${env.BUILD_NUMBER}
-                    """
-                )
-            }
+                """,
+                attachLog: true
+            )
         }
     }
 }
