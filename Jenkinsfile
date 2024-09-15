@@ -12,8 +12,9 @@ pipeline {
             steps {
                 echo 'Executing Unit and Integration Tests...'
                 echo 'Frameworks used: Pytest, Jasmine, Mocha, Robot Framework'
-                sh 'echo "Unit and integration tests in progress..." > test-results.log'
-                sh 'echo "All tests successfully completed." >> test-results.log'
+                // Adjusted for Windows
+                bat 'echo "Running unit and integration tests..." > test-results.log'
+                bat 'echo "All tests successfully completed." >> test-results.log'
             }
         }
         stage('Static Code Review') {
@@ -26,8 +27,9 @@ pipeline {
             steps {
                 echo 'Conducting Security Scans...'
                 echo 'Security Tools: WhiteSource, Acunetix, Fortify, Clair'
-                sh 'echo "Executing security scan..." > security-scan-results.log'
-                sh 'echo "Security scan finished successfully." >> security-scan-results.log'
+                // Adjusted for Windows
+                bat 'echo "Running security scan..." > security-scan-results.log'
+                bat 'echo "Security scan finished successfully." >> security-scan-results.log'
             }
         }
         stage('Staging Deployment') {
@@ -40,8 +42,6 @@ pipeline {
             steps {
                 echo 'Running integration tests on staging...'
                 echo 'Testing Tools: JMeter, Gatling, SoapUI, Katalon Studio'
-                // Comment to indicate where build failed
-                echo 'Build failed at running integration test'
             }
         }
         stage('Production Deployment') {
