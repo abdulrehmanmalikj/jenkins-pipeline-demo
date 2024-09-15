@@ -34,17 +34,19 @@ pipeline {
             }
             post {
                 always {
-                    def buildStatus = currentBuild.result ?: 'SUCCESS'
-                    emailext (
-                        to: "${env.RECIPIENT}",
-                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Static Code Analysis ${buildStatus}",
-                        body: """
-                            Static Code Analysis Status: ${buildStatus}
-                            Job: ${env.JOB_NAME}
-                            Build Number: ${env.BUILD_NUMBER}
-                        """,
-                        attachmentsPattern: 'eslint-report.json'
-                    )
+                    script {
+                        def buildStatus = currentBuild.result ?: 'SUCCESS'
+                        emailext (
+                            to: "${env.RECIPIENT}",
+                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Static Code Analysis ${buildStatus}",
+                            body: """
+                                Static Code Analysis Status: ${buildStatus}
+                                Job: ${env.JOB_NAME}
+                                Build Number: ${env.BUILD_NUMBER}
+                            """,
+                            attachmentsPattern: 'eslint-report.json'
+                        )
+                    }
                 }
             }
         }
@@ -78,17 +80,19 @@ pipeline {
             }
             post {
                 always {
-                    def buildStatus = currentBuild.result ?: 'SUCCESS'
-                    emailext (
-                        to: "${env.RECIPIENT}",
-                        subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Dynamic Security Testing ${buildStatus}",
-                        body: """
-                            Dynamic Security Testing Status: ${buildStatus}
-                            Job: ${env.JOB_NAME}
-                            Build Number: ${env.BUILD_NUMBER}
-                        """,
-                        attachmentsPattern: 'dynamic-security.log'
-                    )
+                    script {
+                        def buildStatus = currentBuild.result ?: 'SUCCESS'
+                        emailext (
+                            to: "${env.RECIPIENT}",
+                            subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - Dynamic Security Testing ${buildStatus}",
+                            body: """
+                                Dynamic Security Testing Status: ${buildStatus}
+                                Job: ${env.JOB_NAME}
+                                Build Number: ${env.BUILD_NUMBER}
+                            """,
+                            attachmentsPattern: 'dynamic-security.log'
+                        )
+                    }
                 }
             }
         }
@@ -153,17 +157,19 @@ pipeline {
 
     post {
         always {
-            def buildStatus = currentBuild.result ?: 'SUCCESS'
-            emailext (
-                to: "${env.RECIPIENT}",
-                subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - ${buildStatus}",
-                body: """
-                    Build Status: ${buildStatus}
-                    Job: ${env.JOB_NAME}
-                    Build Number: ${env.BUILD_NUMBER}
-                """,
-                attachLog: true
-            )
+            script {
+                def buildStatus = currentBuild.result ?: 'SUCCESS'
+                emailext (
+                    to: "${env.RECIPIENT}",
+                    subject: "${env.JOB_NAME} - Build ${env.BUILD_NUMBER} - ${buildStatus}",
+                    body: """
+                        Build Status: ${buildStatus}
+                        Job: ${env.JOB_NAME}
+                        Build Number: ${env.BUILD_NUMBER}
+                    """,
+                    attachLog: true
+                )
+            }
         }
     }
 }
