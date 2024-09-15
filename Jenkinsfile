@@ -2,72 +2,66 @@ pipeline {
     agent any
 
     stages {
-        stage('Compile') {
+        stage('Build') {
             steps {
-                echo 'Compiling the project...'
-                echo 'Tools involved: Bazel, Make, CMake for building'
+                echo 'Building the code...'
+                echo 'Tools used: Maven for Java projects, npm for Node.js projects.'
             }
         }
-        stage('Testing') {
+        stage('Unit and Integration Tests') {
             steps {
-                echo 'Executing Unit and Integration Tests...'
-                echo 'Frameworks used: Pytest, Jasmine, Mocha, Robot Framework'
-                // Adjusted for Windows
-                bat 'echo "Running unit and integration tests..." > test-results.log'
-                bat 'echo "All tests successfully completed." >> test-results.log'
+                echo 'Running Unit and Integration Tests...'
+                echo 'Tools used: JUnit for Java, NUnit for .NET, Mocha for Node.js.'
             }
         }
-        stage('Static Code Review') {
+        stage('Code Analysis') {
             steps {
-                echo 'Performing Static Code Analysis...'
-                echo 'Tools for analysis: ESLint, Pylint, Codacy, Flake8'
+                echo 'Running Code Analysis...'
+                echo 'Tools used: SonarQube for static code analysis.'
             }
         }
-        stage('Vulnerability Check') {
+        stage('Security Scan') {
             steps {
-                echo 'Conducting Security Scans...'
-                echo 'Security Tools: WhiteSource, Acunetix, Fortify, Clair'
-                // Adjusted for Windows
-                bat 'echo "Running security scan..." > security-scan-results.log'
-                bat 'echo "Security scan finished successfully." >> security-scan-results.log'
+                echo 'Running Security Scan...'
+                echo 'Tools used: OWASP Dependency-Check for dependency vulnerabilities.'
             }
         }
-        stage('Staging Deployment') {
+        stage('Deploy to Staging') {
             steps {
-                echo 'Deploying application to staging environment...'
-                echo 'Deployment Tools: Jenkins X, GitLab CI/CD, CircleCI'
+                echo 'Deploying to Staging...'
+                echo 'Tools used: Docker for containerization, Kubernetes or Helm for orchestration.'
             }
         }
-        stage('Staging Tests') {
+        stage('Integration Tests on Staging') {
             steps {
-                echo 'Running integration tests on staging...'
-                echo 'Testing Tools: JMeter, Gatling, SoapUI, Katalon Studio'
+                echo 'Running Integration Tests on Staging...'
+                echo 'Tools used: Selenium for UI testing, Postman for API testing.'
             }
         }
-        stage('Production Deployment') {
+        stage('Deploy to Production') {
             steps {
-                echo 'Deploying to the production environment...'
-                echo 'Deployment automation: Terraform, Packer, Chef, Puppet'
+                echo 'Deploying to Production...'
+                echo 'Tools used: Jenkins deployment plugins, Docker, Kubernetes/Helm.'
             }
         }
     }
     post {
         always {
-            echo 'The pipeline has completed!'
+            echo 'Pipeline finished!'
         }
         failure {
             emailext attachLog: true,
                      to: 'ar67445@gmail.com',
-                     subject: "Build Failed: ${env.BUILD_ID} - Review Required",
-                     body: """<p>Build ${env.BUILD_ID} encountered an issue.</p>
-                              <p>Check Jenkins here: ${env.BUILD_URL}</p>"""
+                     subject: "Jenkins Build Failed: ${env.BUILD_ID}",
+                     body: """<p>Build ${env.BUILD_ID} failed.</p>
+                              <p>Check Jenkins for details: ${env.BUILD_URL}</p>"""
         }
         success {
             emailext attachLog: true,
                      to: 'ar67445@gmail.com',
-                     subject: "Build Succeeded: ${env.BUILD_ID}",
-                     body: """<p>Build ${env.BUILD_ID} was successful.</p>
-                              <p>Check Jenkins for more details: ${env.BUILD_URL}</p>"""
+                     subject: "Jenkins Build Success: ${env.BUILD_ID}",
+                     body: """<p>Build ${env.BUILD_ID} completed successfully.</p>
+                              <p>Check Jenkins for details: ${env.BUILD_URL}</p>"""
         }
     }
 }
